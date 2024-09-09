@@ -4,20 +4,28 @@ import { useRouter } from 'next/navigation'
 import styles from './page.module.css'
 import AnimatedBackground from './components/AnimatedBackground'
 import Image from 'next/image'
+import { useAccount } from 'wagmi'
 import { useAuth } from './hooks/useAuth'
 
 export default function Home() {
   const router = useRouter()
-  const { isAuthenticated, isLoading } = useAuth()
+  const { address, isConnected } = useAccount()
+  const { isAuthenticated, isLoading, userRole } = useAuth()
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      router.push('/registration')
+    if (!isLoading) {
+      if (isConnected && isAuthenticated) {
+        if (userRole) {
+          router.push(`/dashboard/${userRole}`)
+        } else {
+          router.push('/registration')
+        }
+      }
     }
-  }, [isAuthenticated, isLoading, router])
+  }, [isConnected, isAuthenticated, isLoading, userRole, router])
 
   if (isLoading) {
-    return <div>Loading...</div> // Or a more sophisticated loading component
+    return <div>Loading...</div>
   }
 
   return (

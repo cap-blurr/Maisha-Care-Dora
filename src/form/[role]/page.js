@@ -14,6 +14,32 @@ export default function Form({ params }) {
     idPhoto: null,
   })
 
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    try {
+      const response = await fetch('/api/submit-form', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Form submission failed');
+      }
+      
+      const result = await response.json();
+      console.log('Form submitted:', result);
+      
+      // Redirect to signin page after successful submission
+      router.push(`/signin/${params.role}`);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      // Handle error (e.g., show error message to user)
+    }
+  }
+
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.push('/')
@@ -42,17 +68,6 @@ export default function Form({ params }) {
       ...prevState,
       idPhoto: e.target.files[0]
     }))
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    // Here you would typically send the form data to your backend for processing
-    // and integration with Privado.id for verification
-    console.log('Form submitted:', formData)
-    // Simulate successful verification
-    setTimeout(() => {
-      router.push(`/signin/${params.role}`)
-    }, 2000)
   }
 
   return (
